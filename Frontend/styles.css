@@ -1,0 +1,86 @@
+/* Global reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body styling */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f7f5;
+    color: #333;
+    margin: 20px;
+}
+
+/* Headings */
+h1 {
+    color: #293f28;
+    margin-bottom: 10px;
+}
+
+h2 {
+    color: #000;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+h3 {
+    margin-bottom: 10px;
+}
+
+/* Lists */
+ul {
+    list-style-type: square;
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+/* Sections */
+section {
+    margin-top: 20px;
+}
+
+/* Form elements */
+input {
+    display: block;
+    width: 250px;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+/* Buttons */
+button {
+    padding: 10px 15px;
+    background-color: #293f28;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #3d5a3c;
+}
+
+/* Links */
+a {
+    color: #293f28;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Containers (optional improvement) */
+#login-section,
+#signup-form {
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 320px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
