@@ -344,3 +344,38 @@ footer {
 }
 
 
+
+.stack {
+    display: grid;
+    gap: 12px;
+    margin-top: 14px;
+}
+
+.list-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    background: #fff;
+    border: 1px solid rgba(148, 163, 184, 0.24);
+}
+
+.list-row h3 {
+    margin: 0;
+}
+
+.transaction-actions {
+    display: grid;
+    gap: 10px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.income {
+    color: #15803d;
+}
+
+.expense {
+    color: #b91c1c;
+}
