@@ -4,27 +4,50 @@
     <link rel="stylesheet" href="styles.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Finance Manager</title>
+    <title>Finance Manager</title>
 </head>
 <body>
-    <h1>Web Finance Manager</h1>
-    <p>Welcome to the Web Finance Manager! This application helps you manage your finances effectively.</p>
-    <h2>Features</h2>
-    <ul>
-        <li>Track your expenses and income</li>
-        <li>Generate financial reports</li>
-        <li>Set budgets and financial goals</li>
-        <li>Receive financial insights and tips</li>
-    </ul>
-    <h2>Get Started</h2>
-    <section id="login-section">
-  <h3>Login</h3>
-  <input type="text" id="username" placeholder="Username">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p id="signup-link">Don't have an account? <a href="signup.html" onclick="showSignup()">Sign up here</a></p>
-
-</section>
     
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="#" class="logo">FinTrack</a>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#benefits">Benefits</a></li>
+                <li><button type="button"><a href="signup.html">Get Started</a></button></li>
+                <li><a href="login.html">Login</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main>
+        <section class="hero">
+            <div id ="hero-content">
+                <span class="badge">Personal finance</span>
+                <h1>FinTrack</h1>
+                <p>Track your spending, save smarter, and stay in control with a calm, playful dashboard.</p>
+                
+            </div>
+        </section>
+        <section class="feature-grid" id="features">
+            <article class="feature-card">
+                <h2>Smart budgets</h2>
+                <p>Create flexible plans, categorize expenses, and keep each week on track.</p>
+            </article>
+            <article class="feature-card">
+                <h2>Expense tracking</h2>
+                <p>Log payments quickly and see trends that help you save more.</p>
+            </article>
+            <article class="feature-card">
+                <h2>Goal progress</h2>
+                <p>Set savings targets, monitor progress, and celebrate every milestone.</p>
+            </article>
+        </section>
+
+        
+    </main>
+    </br>
+    <footer>
+        <p>Built for everyday budgeting with a bright, simple experience.</p>
+    </footer>
 </body>
 </html>

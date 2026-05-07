@@ -6,18 +6,43 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
 </head>
-<body st>
-    <h1>Sign Up</h1>
-    <section id="signup-section">
-  <h3>Create Your Account</h3>
-    <form id="signup-form">
-        <input type="text" id="new-username" placeholder="Username" required>
-        <input type="email" id="new-email" placeholder="Email" required>
-        <input type="password" id="new-password" placeholder="Password" required>
-        <button type="submit">Sign Up</button>
-    </form>
-    <p id="login-link">Already have an account? <a href="index.html" onclick="showLogin()">Log in here</a></p>
-    </section> 
+<body>
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="index.html" class="logo">FinTrack</a>
     
+        </nav>
+    </header>
+    <main>
+        <section class="card signup-hero">
+            <div>
+                <span class="badge">Join free</span>
+                <h1>Sign Up</h1>
+                <p>Start building healthy habits for your money and keep every goal visible.</p>
+            </div>
+            <form id="signup-form" class="auth-form">
+                <input type="text" id="new-username" placeholder="Username" required>
+                <input type="email" id="new-email" placeholder="Email" required>
+                <input type="password" id="new-password" placeholder="Password" required>
+                <button type="submit">Create account</button>
+            </form>
+            <p class="small-note">Already have an account? <a href="login.html">Log in here</a>.</p>
+        </section>
+
+        <section class="benefits-grid">
+            <article class="feature-card">
+                <h2>Instant setup</h2>
+                <p>Ready to use with zero clutter and easy onboarding.</p>
+            </article>
+            <article class="feature-card">
+                <h2>Secure</h2>
+                <p>Your data stays safe in an intuitive, calm workspace.</p>
+            </article>
+            <article class="feature-card">
+                <h2>Insightful</h2>
+                <p>Clear progress updates and friendly reminders every day.</p>
+            </article>
+        </section>
+    </main>
 </body>
 </html>
