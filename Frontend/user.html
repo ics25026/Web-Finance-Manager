@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinTrack Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="navbar">
+            <a href="index.html" class="logo">FinTrack</a>
+            <ul class="nav-links">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#transactions">Transactions</a></li>
+                <li><a href="#budgets">Budgets</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="card">
+            <span class="badge">User dashboard</span>
+            <h1>Welcome back, <span id="display-username">User</span></h1>
+            <p>Monitor your spending, cash flow, and budget progress in real time.</p>
+        </section>
+
+        <section class="hero-cards" id="overview">
+            <article class="metric-card">
+                <h3>Current Balance</h3>
+                <strong id="balance-value">$0.00</strong>
+            </article>
+            <article class="metric-card">
+                <h3>Monthly Income</h3>
+                <strong id="income-value">$0.00</strong>
+            </article>
+            <article class="metric-card">
+                <h3>Monthly Expenses</h3>
+                <strong id="expense-value">$0.00</strong>
+            </article>
+        </section>
+
+        <section class="card" id="transactions">
+            <div class="card-header">
+                <h2>Add Transaction</h2>
+                <p>Create income or expense entries with category labels.</p>
+            </div>
+            <form id="transaction-form" class="auth-form">
+                <input id="transaction-name" type="text" placeholder="Transaction name" required>
+                <input id="transaction-amount" type="number" min="0.01" step="0.01" placeholder="Amount" required>
+                <input id="transaction-category" type="text" placeholder="Category (e.g. Food, Salary)" required>
+                <div class="transaction-actions">
+                    <button type="submit" data-type="expense">Add Expense</button>
+                    <button type="submit" data-type="income">Add Income</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="card" id="budgets">
+            <div class="card-header">
+                <h2>Budget Planner</h2>
+            </div>
+            <form id="budget-form" class="auth-form">
+                <input id="budget-category" type="text" placeholder="Budget category" required>
+                <input id="budget-limit" type="number" min="1" step="1" placeholder="Monthly limit" required>
+                <button type="submit">Set Budget</button>
+            </form>
+            <div id="budget-list" class="stack"></div>
+        </section>
+
+        <section class="card">
+            <div class="card-header">
+                <h2>Recent Transactions</h2>
+            </div>
+            <div id="transaction-list" class="stack"></div>
+        </section>
+    </main>
+
+    <script src="user.js"></script>
+</body>
+</html>
