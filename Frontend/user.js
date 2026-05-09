@@ -1,3 +1,8 @@
+const session = requireAuthOrRedirect();
+if (!session) {
+  throw new Error('Unauthorized');
+}
+
 const state = {
   username: localStorage.getItem('fintrack_username') || 'User',
   transactions: JSON.parse(localStorage.getItem('fintrack_transactions') || '[]'),
