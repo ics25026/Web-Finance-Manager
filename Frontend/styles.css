@@ -26,17 +26,15 @@ body {
     font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: linear-gradient(180deg, #000000, #1a2a36);
     line-height: 1.6;
-    padding: 24px;
 }
 
 .site-header {
     background: transparent;
     border-style: hidden;
     padding: 20px 24px;
-    margin: 16px auto 32px;
     border-radius: 5px;
     box-shadow: 0px 5px 140px rgba(0, 0, 0, 0.8);
-
+    margin-bottom: 20px;
 }
 
 
@@ -98,8 +96,6 @@ body {
 main {
     display: flex;
     flex-direction: column;
-    gap: 24px;
-    width: min(100%, 980px);
     margin: 0 auto;
 }
 
@@ -138,12 +134,13 @@ p {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 24px;
-    background: var(--surface-strong);
-    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: linear-gradient(270deg, rgba(54, 141, 147, 0.95), rgba(255, 255, 255, 0.95)); 
     border-radius: var(--radius);
     box-shadow: var(--shadow);
     padding: 36px;
-    align-items: center;
+    margin-left: 40px;
+    margin-right: 40px;
+    margin-bottom: 140px;
 }
 
 .hero .badge,
@@ -204,6 +201,8 @@ p {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 16px;
+    margin-left: 15px;
+    margin-right: 15px;
 }
 
 .metric-card,
@@ -252,6 +251,19 @@ p {
     display: grid;
     gap: 16px;
     margin-top: 8px;
+}
+.signup-hero,
+#login-section{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    background: linear-gradient(270deg, rgba(38, 112, 91, 0.95), rgba(255, 255, 255, 0.95));
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 36px;
+        margin-left: 40px;
+        margin-right: 40px;
+        margin-bottom: 140px;
 }
 
 input,
