@@ -1,5 +1,5 @@
 const SUPABASE_URL = 'https://mzysoyzojevfiiofjump.supabase.co';
-const SUPABASE_ANON_KEY = 'PASTE_YOUR_SUPABASE_ANON_KEY_HERE';
+const SUPABASE_ANON_KEY = 'sb_publishable_sxyEvrmij9RoeeorMzZQEg_rc_7t21B';
 
 const AUTH_STORAGE_KEY = 'fintrack_supabase_session';
 const USER_STORAGE_KEY = 'fintrack_username';
