@@ -1,13 +1,103 @@
-const session = requireAuthOrRedirect();
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+/* ---------------- SUPABASE ---------------- */
+const SUPABASE_URL = 'https://mzysoyzojevfiiofjump.supabase.co'; 
+const SUPABASE_ANON_KEY = 'sb_publishable_sxyEvrmij9RoeeorMzZQEg_rc_7t21B';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* ---------------- AUTH CHECK ---------------- */
+const {
+  data: { session }
+} = await supabase.auth.getSession();
+
 if (!session) {
-  throw new Error('Unauthorized');
+  window.location.href = "login.html";
+  throw new Error("Unauthorized");
 }
 
+const {
+  data: { user },
+  error: userError
+} = await supabase.auth.getUser();
+
+if (userError || !user) {
+  window.location.href = "login.html";
+  throw new Error("Unauthorized");
+}
+
+/* ---------------- USERNAME ---------------- */
+let username = "User";
+
+if (user) {
+  username =
+    user.user_metadata?.full_name ||
+    user.user_metadata?.username ||
+    user.email?.split("@")[0] ||
+    "User";
+
+  localStorage.setItem("fintrack_username", username);
+}
+
+/* ---------------- TRANSACTIONS ---------------- */
+let transactions = [];
+
+if (user) {
+  const { data, error } = await supabase
+    .from("transactions")
+    .select("*")
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false });
+
+  if (!error && data) {
+    transactions = data;
+    localStorage.setItem(
+      "fintrack_transactions",
+      JSON.stringify(transactions)
+    );
+  } else {
+    transactions = JSON.parse(
+      localStorage.getItem("fintrack_transactions") || "[]"
+    );
+  }
+} else {
+  transactions = JSON.parse(
+    localStorage.getItem("fintrack_transactions") || "[]"
+  );
+}
+
+/* ---------------- BUDGETS ---------------- */
+let budgets = [];
+
+if (user) {
+  const { data, error } = await supabase
+    .from("budgets")
+    .select("*")
+    .eq("user_id", user.id);
+
+  if (!error && data) {
+    budgets = data;
+    localStorage.setItem(
+      "fintrack_budgets",
+      JSON.stringify(budgets)
+    );
+  } else {
+    budgets = JSON.parse(
+      localStorage.getItem("fintrack_budgets") || "[]"
+    );
+  }
+} else {
+  budgets = JSON.parse(
+    localStorage.getItem("fintrack_budgets") || "[]"
+  );
+}
+
+/* ---------------- FINAL STATE ---------------- */
 const state = {
-  username: localStorage.getItem('fintrack_username') || 'User',
-  transactions: JSON.parse(localStorage.getItem('fintrack_transactions') || '[]'),
-  budgets: JSON.parse(localStorage.getItem('fintrack_budgets') || '[]')
+  username,
+  transactions,
+  budgets
 };
+
 
 const displayUsername = document.getElementById('display-username');
 const balanceValue = document.getElementById('balance-value');

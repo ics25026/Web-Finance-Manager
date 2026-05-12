@@ -1,30 +1,45 @@
-const signupForm = document.getElementById('signup-form');
-const signupStatus = document.getElementById('signup-status');
+import { signUp } from "./auth.js";
 
-signupForm.addEventListener('submit', async (event) => {
+const signupForm = document.getElementById("signup-form");
+const signupStatus = document.getElementById("signup-status");
+
+signupForm.addEventListener("submit", async (event) => {
   event.preventDefault();
 
-  if (!isConfigValid()) {
-    signupStatus.textContent = 'Add your Supabase anon key in auth.js before signing up.';
-    return;
-  }
+  const username = document
+    .getElementById("new-username")
+    .value.trim();
 
-  const username = document.getElementById('new-username').value.trim();
-  const email = document.getElementById('new-email').value.trim();
-  const password = document.getElementById('new-password').value;
+  const email = document
+    .getElementById("new-email")
+    .value.trim();
+
+  const password =
+    document.getElementById("new-password").value;
 
   try {
-    signupStatus.textContent = 'Creating account...';
-    const result = await signUp({ username, email, password });
+    signupStatus.textContent = "Creating account...";
 
-    signupStatus.textContent = result.needsEmailConfirmation
-      ? result.message
-      : 'Account created. Redirecting to dashboard...';
+    const data = await signUp(
+      email,
+      password,
+      username
+    );
 
-    if (!result.needsEmailConfirmation) {
-      window.location.href = 'user.html';
+    /* Email confirmation required */
+    if (!data.session) {
+      signupStatus.textContent =
+        "Account created. Check your email to confirm.";
+
+      return;
     }
+
+    signupStatus.textContent =
+      "Account created. Redirecting...";
+
+    window.location.href = "user.html";
   } catch (error) {
-    signupStatus.textContent = error.message;
+    signupStatus.textContent =
+      error.message || "Signup failed.";
   }
 });
