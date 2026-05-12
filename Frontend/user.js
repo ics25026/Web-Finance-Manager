@@ -43,10 +43,13 @@ let transactions = [];
 
 if (user) {
   const { data, error } = await supabase
-    .from("transactions")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false });
+  .from("transactions")
+  .select(`
+    *,
+    categories(name)
+  `)
+  .eq("user_id", user.id)
+  .order("created_at", { ascending: false });
 
   if (!error && data) {
     transactions = data;
@@ -133,7 +136,7 @@ function renderOverview() {
   expenseValue.textContent = currency(expense);
 }
 
-function renderTransactions() {
+ function renderTransactions() {
   transactionList.innerHTML = '';
 
   if (state.transactions.length === 0) {
@@ -143,11 +146,12 @@ function renderTransactions() {
 
   [...state.transactions].reverse().forEach((item) => {
     const row = document.createElement('article');
+
     row.className = 'list-row';
     row.innerHTML = `
       <div>
         <h3>${item.name}</h3>
-        <p>${item.category}</p>
+        <p>${item.categories?.name || 'Unknown Category'}</p>
       </div>
       <strong class="${item.type === 'income' ? 'income' : 'expense'}">${item.type === 'income' ? '+' : '-'}${currency(item.amount)}</strong>
     `;
@@ -182,20 +186,98 @@ function renderBudgets() {
   });
 }
 
-transactionForm.addEventListener('submit', (event) => {
+transactionForm.addEventListener("submit", async (event) => {
   event.preventDefault();
-  const trigger = event.submitter?.dataset?.type || 'expense';
-  const name = document.getElementById('transaction-name').value.trim();
-  const amount = Number(document.getElementById('transaction-amount').value);
-  const category = document.getElementById('transaction-category').value.trim();
 
-  if (!name || !category || Number.isNaN(amount) || amount <= 0) {
+  const trigger =
+    event.submitter?.dataset?.type || "expense";
+
+  const name = document
+    .getElementById("transaction-name")
+    .value.trim();
+
+  const amount = Number(
+    document.getElementById("transaction-amount").value
+  );
+
+  const categoryName = document
+    .getElementById("transaction-category")
+    .value.trim();
+
+  if (!name || !categoryName || amount <= 0) return;
+
+  let categoryId = null;
+
+  /* -----------------------------------
+     1. SEARCH EXISTING CATEGORY
+  ----------------------------------- */
+
+  const { data: existingCategory } = await supabase
+    .from("categories")
+    .select("id")
+    .eq("user_id", user.id)
+    .ilike("name", categoryName)
+    .limit(1)
+    .maybeSingle();
+
+  if (existingCategory) {
+    categoryId = existingCategory.id;
+  } else {
+    /* -----------------------------------
+       2. CREATE NEW CATEGORY
+    ----------------------------------- */
+
+    const { data: newCategory, error } =
+      await supabase
+        .from("categories")
+        .insert([
+          {
+            user_id: user.id,
+            name: categoryName,
+            type: trigger
+          }
+        ])
+        .select()
+        .single();
+
+    if (error) {
+      alert("Failed creating category");
+      return;
+    }
+
+    categoryId = newCategory.id;
+  }
+
+  /* -----------------------------------
+     3. INSERT TRANSACTION
+  ----------------------------------- */
+
+  const { data, error } = await supabase
+    .from("transactions")
+    .insert([
+      {
+        user_id: user.id,
+        name,
+        amount,
+        type: trigger,
+        category_id: categoryId
+      }
+    ])
+    .select(`
+      *,
+      categories(name)
+    `)
+    .single();
+
+  if (error) {
+    alert("Failed saving transaction");
     return;
   }
 
-  state.transactions.push({ name, amount, category, type: trigger, createdAt: Date.now() });
+  state.transactions.push(data);
+
   transactionForm.reset();
-  save();
+
   renderOverview();
   renderTransactions();
   renderBudgets();
