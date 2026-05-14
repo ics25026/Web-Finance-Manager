@@ -74,7 +74,10 @@ let budgets = [];
 if (user) {
   const { data, error } = await supabase
     .from("budgets")
-    .select("*")
+    .select(`
+      *,
+      categories(name)
+    `)
     .eq("user_id", user.id);
 
   if (!error && data) {
@@ -168,20 +171,34 @@ function renderBudgets() {
   }
 
   state.budgets.forEach((budget) => {
-    const spent = state.transactions
-      .filter((item) => item.type === 'expense' && item.category.toLowerCase() === budget.category.toLowerCase())
-      .reduce((sum, item) => sum + item.amount, 0);
+    const categoryName = budget.categories?.name || 'Unknown';
 
-    const remaining = budget.limit - spent;
+    const spent = state.transactions
+      .filter((item) =>
+        item.type === 'expense' &&
+        item.categories?.name?.toLowerCase() === categoryName.toLowerCase()
+      )
+      .reduce((sum, item) => sum + Number(item.amount), 0);
+
+    const limit = Number(budget.amount_limit);
+
+    const remaining = limit - spent;
+
     const row = document.createElement('article');
     row.className = 'list-row';
+
     row.innerHTML = `
       <div>
-        <h3>${budget.category}</h3>
-        <p>Limit: ${currency(budget.limit)} | Spent: ${currency(spent)}</p>
+        <h3>${categoryName}</h3>
+        <p>Limit: ${currency(limit)} | Spent: ${currency(spent)}</p>
       </div>
-      <strong class="${remaining < 0 ? 'expense' : 'income'}">${remaining < 0 ? 'Over by' : 'Left'} ${currency(Math.abs(remaining))}</strong>
+      <strong class="${remaining < 0 ? 'expense' : 'income'}">
+        ${remaining < 0 ? 'Over by' : 'Left'} ${currency(Math.abs(remaining))}
+      </strong>
+      <button class="delete-btn" data-category-id="${budget.category_id}">Delete</button>
+
     `;
+
     budgetList.appendChild(row);
   });
 }
@@ -283,26 +300,126 @@ transactionForm.addEventListener("submit", async (event) => {
   renderBudgets();
 });
 
-budgetForm.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const category = document.getElementById('budget-category').value.trim();
-  const limit = Number(document.getElementById('budget-limit').value);
+budgetForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
 
-  if (!category || Number.isNaN(limit) || limit <= 0) {
+  const categoryName = document
+    .getElementById("budget-category")
+    .value
+    .trim();
+
+  const amount = Number(
+    document.getElementById("budget-limit").value
+  );
+
+  if (!categoryName || !amount) return;
+
+  let categoryId;
+
+  /* ---------------- FIND CATEGORY ---------------- */
+  let { data: category, error: categoryError } = await supabase
+    .from("categories")
+    .select("id,name")
+    .eq("user_id", user.id)
+    .ilike("name", categoryName)
+    .maybeSingle();
+
+  if (categoryError) {
+    console.log(categoryError);
     return;
   }
 
-  const existing = state.budgets.find((item) => item.category.toLowerCase() === category.toLowerCase());
-  if (existing) {
-    existing.limit = limit;
-  } else {
-    state.budgets.push({ category, limit });
+  /* ---------------- CREATE CATEGORY IF NOT EXISTS ---------------- */
+  if (!category) {
+    const { data: newCategory, error: createError } = await supabase
+      .from("categories")
+      .insert([
+        {
+          user_id: user.id,
+          name: categoryName,
+          type: "expense"
+        }
+      ])
+      .select()
+      .single();
+
+    if (createError) {
+      console.log(createError);
+      return;
+    }
+
+    category = newCategory;
   }
 
-  budgetForm.reset();
-  save();
+  categoryId = category.id;
+
+  /* ---------------- UPSERT BUDGET ---------------- */
+  const { data, error } = await supabase
+    .from("budgets")
+    .upsert(
+      {
+        user_id: user.id,
+        category_id: categoryId,
+        amount_limit: amount
+      },
+      {
+        onConflict: "user_id,category_id"
+      }
+    )
+    .select(`
+      *,
+      categories(name)
+    `)
+    .single();
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+  /* ---------------- UPDATE STATE ---------------- */
+  const index = state.budgets.findIndex(
+    (b) => b.category_id === data.category_id
+  );
+
+  if (index >= 0) {
+    state.budgets[index] = data;
+  } else {
+    state.budgets.push(data);
+  }
+
+  /* ---------------- RENDER ---------------- */
   renderBudgets();
+  save();
+  budgetForm.reset();
 });
+
+budgetList.addEventListener("click", async (e) => {
+  e.preventDefault();
+  if (!e.target.classList.contains("delete-btn")) return;
+  
+  const categoryId = e.target.dataset.categoryId;
+  const { error } = await supabase
+    .from("budgets")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("category_id", categoryId); 
+
+  if (error) {
+    console.log(error);
+    return;
+  }
+
+state.budgets = state.budgets.filter(
+  b => b.category_id !== categoryId
+);
+  save();
+  budgetForm.reset();
+  renderBudgets();
+
+});
+
+
 
 displayUsername.textContent = state.username;
 renderOverview();
