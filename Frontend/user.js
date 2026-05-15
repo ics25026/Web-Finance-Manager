@@ -192,11 +192,12 @@ function renderBudgets() {
         <h3>${categoryName}</h3>
         <p>Limit: ${currency(limit)} | Spent: ${currency(spent)}</p>
       </div>
-      <strong class="${remaining < 0 ? 'expense' : 'income'}">
+      <div id = "bdgbtn">
+        <strong class="${remaining < 0 ? 'expense' : 'income'}">
         ${remaining < 0 ? 'Over by' : 'Left'} ${currency(Math.abs(remaining))}
-      </strong>
-      <button class="delete-btn" data-category-id="${budget.category_id}">Delete</button>
-
+        </strong>
+        <button class="delete-btn" data-category-id="${budget.category_id}">Delete</button>
+      </div>
     `;
 
     budgetList.appendChild(row);
