@@ -398,3 +398,14 @@ footer {
     gap: 20px;
     align-items: center;
 }
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+canvas {
+    width: 100% !important;
+    max-height: 320px;
+}

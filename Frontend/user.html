@@ -39,6 +39,24 @@
                 <strong id="expense-value">$0.00</strong>
             </article>
         </section>
+        <section class="charts-grid">
+
+            <div class="card">
+                    <h2>Expenses by Category</h2>
+                <canvas id="expense-category-chart"></canvas>
+            </div>
+
+            <div class="card">
+                 <h2>Expenses by Month</h2>
+                <canvas id="monthly-expense-chart"></canvas>
+            </div>
+
+            <div class="card">
+                <h2>Balance Over Time</h2>
+             <canvas id="balance-chart"></canvas>
+            </div>
+
+</section>
 
         <section class="card" id="transactions">
             <div class="card-header">
@@ -75,7 +93,7 @@
             <div id="transaction-list" class="stack"></div>
         </section>
     </main>
-
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script type="module" src="auth.js"></script>
     <script type="module" src="user.js"></script>
 </body>

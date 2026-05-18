@@ -113,6 +113,24 @@ const transactionForm = document.getElementById('transaction-form');
 const budgetForm = document.getElementById('budget-form');
 const transactionList = document.getElementById('transaction-list');
 const budgetList = document.getElementById('budget-list');
+/* ---------------- CHARTS ---------------- */
+
+const expenseCategoryChartCanvas = document.getElementById(
+  "expense-category-chart"
+);
+
+const monthlyExpenseChartCanvas = document.getElementById(
+  "monthly-expense-chart"
+);
+
+const balanceChartCanvas = document.getElementById(
+  "balance-chart"
+);
+/* ---------------- CHART INSTANCES ---------------- */
+
+let expenseCategoryChart;
+let monthlyExpenseChart;
+let balanceChart;
 
 function currency(amount) {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
@@ -160,6 +178,7 @@ function renderOverview() {
     `;
     transactionList.appendChild(row);
   });
+  
 }
 
 function renderBudgets() {
@@ -202,6 +221,143 @@ function renderBudgets() {
 
     budgetList.appendChild(row);
   });
+}
+function renderCharts() {
+
+  /* =========================
+     DESTROY OLD CHARTS
+  ========================= */
+
+  if (expenseCategoryChart) expenseCategoryChart.destroy();
+  if (monthlyExpenseChart) monthlyExpenseChart.destroy();
+  if (balanceChart) balanceChart.destroy();
+
+  /* =========================
+     PIE CHART
+     Expenses by Category
+  ========================= */
+
+  const expenses = state.transactions.filter(
+    t => t.type === "expense"
+  );
+
+  const categoryTotals = {};
+
+  expenses.forEach(transaction => {
+    const category =
+      transaction.categories?.name || "Unknown";
+
+    categoryTotals[category] =
+      (categoryTotals[category] || 0) +
+      Number(transaction.amount);
+  });
+
+  expenseCategoryChart = new Chart(
+    expenseCategoryChartCanvas,
+    {
+      type: "pie",
+      data: {
+        labels: Object.keys(categoryTotals),
+        datasets: [
+          {
+            data: Object.values(categoryTotals)
+          }
+        ]
+      }
+    }
+  );
+
+  /* =========================
+     BAR CHART
+     Expenses by Month
+  ========================= */
+
+  const monthlyTotals = {};
+
+  expenses.forEach(transaction => {
+
+    const date = new Date(
+      transaction.created_at
+    );
+
+    const month =
+      date.toLocaleString("en-US", {
+        month: "short"
+      });
+
+    monthlyTotals[month] =
+      (monthlyTotals[month] || 0) +
+      Number(transaction.amount);
+  });
+
+  monthlyExpenseChart = new Chart(
+    monthlyExpenseChartCanvas,
+    {
+      type: "bar",
+      data: {
+        labels: Object.keys(monthlyTotals),
+        datasets: [
+          {
+            label: "Expenses",
+            data: Object.values(monthlyTotals)
+          }
+        ]
+      }
+    }
+  );
+
+  /* =========================
+     LINE CHART
+     Balance Over Time
+  ========================= */
+
+  const sortedTransactions =
+    [...state.transactions].sort(
+      (a, b) =>
+        new Date(a.created_at) -
+        new Date(b.created_at)
+    );
+
+  let runningBalance = 0;
+
+  const balanceLabels = [];
+  const balanceData = [];
+
+  sortedTransactions.forEach(transaction => {
+
+    if (transaction.type === "income") {
+      runningBalance += Number(transaction.amount);
+    } else {
+      runningBalance -= Number(transaction.amount);
+    }
+
+    const date = new Date(
+      transaction.created_at
+    );
+
+    balanceLabels.push(
+      date.toLocaleDateString()
+    );
+
+    balanceData.push(runningBalance);
+  });
+
+  balanceChart = new Chart(
+    balanceChartCanvas,
+    {
+      type: "line",
+      data: {
+        labels: balanceLabels,
+        datasets: [
+          {
+            label: "Balance",
+            data: balanceData,
+            tension: 0.3
+          }
+        ]
+      }
+    }
+  );
 }
 
 transactionForm.addEventListener("submit", async (event) => {
@@ -299,6 +455,7 @@ transactionForm.addEventListener("submit", async (event) => {
   renderOverview();
   renderTransactions();
   renderBudgets();
+  renderCharts();
 });
 
 budgetForm.addEventListener("submit", async (e) => {
@@ -417,6 +574,7 @@ state.budgets = state.budgets.filter(
   save();
   budgetForm.reset();
   renderBudgets();
+  renderCharts();
 
 });
 
@@ -426,3 +584,4 @@ displayUsername.textContent = state.username;
 renderOverview();
 renderTransactions();
 renderBudgets();
+renderCharts();
