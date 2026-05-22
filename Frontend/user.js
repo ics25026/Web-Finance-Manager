@@ -119,7 +119,8 @@ if (user) {
 const state = {
   username,
   transactions,
-  budgets
+  budgets,
+  recurringPayments
 };
 
 
@@ -287,7 +288,8 @@ function renderCharts() {
             data: Object.values(categoryTotals)
           }
         ]
-      }
+      },
+      
     }
   );
 
@@ -302,7 +304,7 @@ function renderCharts() {
   expenses.forEach(transaction => {
 
     const date = new Date(
-      transaction.created_at
+      transaction.transaction_date
     );
 
     const month =
@@ -327,6 +329,10 @@ function renderCharts() {
             data: Object.values(monthlyTotals)
           }
         ]
+      },
+      options: {
+    responsive: true,
+    maintainAspectRatio: false
       }
     }
   );
@@ -380,6 +386,10 @@ function renderCharts() {
             tension: 0.3
           }
         ]
+      },
+      options: {
+    responsive: true,
+    maintainAspectRatio: false
       }
     }
   );

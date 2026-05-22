@@ -579,12 +579,17 @@ button:focus-visible,
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: var(--sp-5);
     margin-top: var(--sp-4);
+    
 }
 
 canvas {
     width: 100% !important;
-    max-height: 260px;
 }
+.chart-box {
+    height: 280px;   /* 👈 main fix */
+    width: 100%;
+}
+
 
 /* ============================================================
    Form elements
