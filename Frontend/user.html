@@ -1,100 +1,331 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FinTrack Dashboard</title>
-    <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinTrack — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&family=Source+Code+Pro:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <header class="site-header">
-        <nav class="navbar">
-            <a href="index.html" class="logo">FinTrack</a>
-            <ul class="nav-links">
-                <li><a href="#overview">Overview</a></li>
-                <li><a href="#transactions">Transactions</a></li>
-                <li><a href="#budgets">Budgets</a></li>
-            </ul>
-        </nav>
-    </header>
 
-    <main>
-        <section class="card">
-            <span class="badge">User dashboard</span>
-            <h1>Welcome back, <span id="display-username">User</span></h1>
-            <p>Monitor your spending, cash flow, and budget progress in real time.</p>
-        </section>
+  <!-- ═══════════════════════════════════════
+       NAV
+  ════════════════════════════════════════ -->
+  <header class="site-header" role="banner">
+    <nav class="navbar" aria-label="Primary navigation">
+      <a href="index.html" class="logo" aria-label="FinTrack home">FinTrack</a>
 
-        <section class="hero-cards" id="overview">
-            <article class="metric-card">
-                <h3>Current Balance</h3>
-                <strong id="balance-value">$0.00</strong>
-            </article>
-            <article class="metric-card">
-                <h3>Income</h3>
-                <strong id="income-value">$0.00</strong>
-            </article>
-            <article class="metric-card">
-                <h3>Expenses</h3>
-                <strong id="expense-value">$0.00</strong>
-            </article>
-        </section>
-        <section class="charts-grid">
+      <ul class="nav-links" role="list">
+        <li><a href="#overview"      aria-current="page">Overview</a></li>
+        <li><a href="#transactions">Transactions</a></li>
+        <li><a href="#budgets">Budgets</a></li>
+        <li><a href="#recurring">Recurring</a></li>
+        <a href="/Frontend/index.html" id="logout-link" class="btn-ghost" aria-label="Log out">
+        <svg width="16" height="16" viewBox="0 0 25 25" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/></svg>
+        Log out
+      </a>
+      </ul>
+      
+    </nav>
+  </header>
 
-            <div class="card">
-                    <h2>Expenses by Category</h2>
-                <canvas id="expense-category-chart"></canvas>
-            </div>
+  <!-- ═══════════════════════════════════════
+       SHELL  sidebar + content
+  ════════════════════════════════════════ -->
+  <div class="shell">
 
-            <div class="card">
-                 <h2>Expenses by Month</h2>
-                <canvas id="monthly-expense-chart"></canvas>
-            </div>
+    <!-- Sidebar -->
+    <aside class="sidebar" aria-label="Section navigation">
+      <p class="sidebar-section-label">Overview</p>
+      <a href="#overview"      class="sidebar-link" aria-current="page">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
 
-            <div class="card">
-                <h2>Balance Over Time</h2>
-             <canvas id="balance-chart"></canvas>
-            </div>
+      <p class="sidebar-section-label">Activity</p>
+      <a href="#transactions" class="sidebar-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 16V4m0 0L3 8m4-4 4 4"/><path d="M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+        Transactions
+      </a>
+      <a href="#recurring" class="sidebar-link">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+        Recurring
+      </a>
 
-</section>
+      <p class="sidebar-section-label">Planning</p>
+      <a href="#budgets" class="sidebar-link">
+<!-- Goal / Target Budget Icon -->
+<svg 
+    width="15" 
+    height="15" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="currentColor" 
+    stroke-width="1.8" 
+    stroke-linecap="round" 
+    stroke-linejoin="round" 
+    aria-hidden="true">
+    <!-- Target circles -->
+    <circle cx="12" cy="12" r="8"/>
+    <circle cx="12" cy="12" r="4"/> 
+    <!-- Center point -->
+    <circle cx="12" cy="12" r="1"/>
+    <!-- Arrow -->
+    <path d="M16 8L21 3"/>
+    <path d="M17 3h4v4"/>
+</svg>        Budgets
+      </a>
+    </aside>
 
-        <section class="card" id="transactions">
-            <div class="card-header">
-                <h2>Add Transaction</h2>
-                <p>Create income or expense entries with category labels.</p>
-            </div>
-            <form id="transaction-form" class="auth-form">
-                <input id="transaction-name" type="text" placeholder="Transaction name" required>
-                <input id="transaction-amount" type="number" min="0.01" step="0.01" placeholder="Amount" required>
-                <input id="transaction-category" type="text" placeholder="Category (e.g. Food, Salary)" required>
-                <div class="transaction-actions">
-                    <button type="submit" data-type="expense">Add Expense</button>
-                    <button type="submit" data-type="income">Add Income</button>
-                </div>
-            </form>
-        </section>
+    <!-- Main content -->
+    <main class="content" id="main-content">
 
-        <section class="card" id="budgets">
-            <div class="card-header">
-                <h2>Budget Planner</h2>
-            </div>
-            <form id="budget-form" class="auth-form">
-                <input id="budget-category" type="text" placeholder="Budget category" required>
-                <input id="budget-limit" type="number" min="1" step="1" placeholder="limit" required>
-                <button type="submit">Set Budget</button>
-            </form>
-            <div id="budget-list" class="stack"></div>
-        </section>
+      <!-- ─── Page header ─── -->
+      <section class="page-header" id="overview" aria-labelledby="page-title">
+        <span class="badge" aria-label="Current month">May 2026</span>
+        <h1 id="page-title">Welcome back, <span id="display-username">User</span></h1>
+        <p>Monitor your spending, cash flow, and budget progress in real time.</p>
+      </section>
 
-        <section class="card">
-            <div class="card-header">
-                <h2>Recent Transactions</h2>
-            </div>
-            <div id="transaction-list" class="stack"></div>
-        </section>
-    </main>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script type="module" src="auth.js"></script>
-    <script type="module" src="user.js"></script>
+      <!-- ─── Metric cards ─── -->
+      <section aria-label="Financial summary" class="hero-cards">
+        <article class="metric-card" aria-label="Current balance">
+          <p class="label">Current balance</p>
+          <strong id="balance-value">$0.00</strong>
+          <p class="delta" id="balance-delta" aria-live="polite"></p>
+        </article>
+
+        <article class="metric-card" aria-label="Total income">
+          <p class="label">Income</p>
+          <strong id="income-value">$0.00</strong>
+          <p class="delta delta-up" id="income-delta" aria-live="polite"></p>
+        </article>
+
+        <article class="metric-card" aria-label="Total expenses">
+          <p class="label">Expenses</p>
+          <strong id="expense-value">$0.00</strong>
+          <p class="delta delta-down" id="expense-delta" aria-live="polite"></p>
+        </article>
+      </section>
+
+      <!-- ─── Charts ─── -->
+      <section aria-label="Charts" class="charts-grid">
+        <div class="card">
+          <div class="card-header">
+            <h2>Expenses by category</h2>
+          </div>
+          <canvas id="expense-category-chart" role="img" aria-label="Doughnut chart of expenses by category"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Monthly expenses</h2>
+          </div>
+          <canvas id="monthly-expense-chart" role="img" aria-label="Bar chart of monthly expenses"></canvas>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h2>Balance over time</h2>
+          </div>
+          <canvas id="balance-chart" role="img" aria-label="Line chart of balance over time"></canvas>
+        </div>
+      </section>
+
+      <!-- ─── Add transaction ─── -->
+      <section class="card" id="transactions" aria-labelledby="add-tx-title">
+        <div class="card-header">
+          <div>
+            <h2 id="add-tx-title">Add transaction</h2>
+            <p>Record income or expense entries with a category label.</p>
+          </div>
+        </div>
+
+        <form id="transaction-form" class="auth-form" novalidate aria-label="New transaction form">
+          <div>
+            <label for="transaction-name">Description</label>
+            <input
+              id="transaction-name"
+              type="text"
+              placeholder="e.g. Supermarket, Freelance invoice"
+              autocomplete="off"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="transaction-amount">Amount</label>
+            <input
+              id="transaction-amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="0.00"
+              inputmode="decimal"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="transaction-category">Category</label>
+            <input
+              id="transaction-category"
+              type="text"
+              placeholder="e.g. Food, Salary, Rent"
+              autocomplete="off"
+              list="category-suggestions"
+              required
+            >
+            <datalist id="category-suggestions">
+              <option value="Food">
+              <option value="Groceries">              
+              <option value="Salary">
+              <option value="Rent">
+              <option value="Transport">
+              <option value="Utilities">
+              <option value="Entertainment">
+              <option value="Healthcare">
+              <option value="Savings">
+              <option value="Other">
+
+            </datalist>
+          </div>
+
+          <div class="transaction-actions">
+            <button type="submit" data-type="expense" class="btn-ghost">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add expense
+            </button>
+            <button type="submit" data-type="income">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add income
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <!-- ─── Recent transactions ─── -->
+      <section class="card" aria-labelledby="tx-list-title">
+        <div class="card-header">
+          <h2 id="tx-list-title">Recent transactions</h2>
+        </div>
+        <div id="transaction-list" class="stack" role="list" aria-label="Transaction list"></div>
+      </section>
+
+      <!-- ─── Budget planner ─── -->
+      <section class="card" id="budgets" aria-labelledby="budget-title">
+        <div class="card-header">
+          <div>
+            <h2 id="budget-title">Budget planner</h2>
+            <p>Set monthly spending limits per category.</p>
+          </div>
+        </div>
+
+        <form id="budget-form" class="auth-form" novalidate aria-label="New budget form">
+          <div>
+            <label for="budget-category">Category</label>
+            <input
+              id="budget-category"
+              type="text"
+              placeholder="e.g. Food, Transport"
+              autocomplete="off"
+              list="category-suggestions"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="budget-limit">Monthly limit</label>
+            <input
+              id="budget-limit"
+              type="number"
+              min="1"
+              step="1"
+              placeholder="0"
+              inputmode="numeric"
+              required
+            >
+          </div>
+
+          <button type="submit" style="justify-self:start">Set budget</button>
+        </form>
+
+        <div id="budget-list" class="stack" role="list" aria-label="Budget list" style="margin-top: var(--sp-5)"></div>
+      </section>
+
+      <!-- ─── Recurring payments ─── -->
+      <section class="card" id="recurring" aria-labelledby="recurring-title">
+        <div class="card-header">
+          <div>
+            <h2 id="recurring-title">Recurring payments</h2>
+            <p>Subscriptions and fixed costs that repeat automatically.</p>
+          </div>
+        </div>
+
+        <form id="recurring-form" class="auth-form" novalidate aria-label="New recurring payment form">
+          <div>
+            <label for="recurring-title-input">Name</label>
+            <input
+              id="recurring-title-input"
+              type="text"
+              placeholder="e.g. Netflix, Rent, Gym"
+              autocomplete="off"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="recurring-amount">Amount</label>
+            <input
+              id="recurring-amount"
+              type="number"
+              min="0.01"
+              step="0.01"
+              placeholder="0.00"
+              inputmode="decimal"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="recurring-category">Category</label>
+            <input
+              id="recurring-category"
+              type="text"
+              placeholder="e.g. Subscriptions, Housing"
+              autocomplete="off"
+              list="category-suggestions"
+              required
+            >
+          </div>
+
+          <div>
+            <label for="recurring-frequency">Frequency</label>
+            <select id="recurring-frequency" aria-label="Payment frequency">
+              <option value="monthly">Monthly</option>
+              <option value="weekly">Weekly</option>
+              <option value="yearly">Yearly</option>
+            </select>
+          </div>
+
+          <button type="submit" style="justify-self:start">Add recurring payment</button>
+        </form>
+
+        <div id="recurring-list" class="stack" role="list" aria-label="Recurring payments list" style="margin-top: var(--sp-5)"></div>
+      </section>
+
+    </main><!-- /content -->
+  </div><!-- /shell -->
+
+  <footer>
+    <p>FinTrack &mdash; personal finance dashboard</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script type="module" src="auth.js"></script>
+  <script type="module" src="user.js"></script>
 </body>
 </html>

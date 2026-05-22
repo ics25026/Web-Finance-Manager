@@ -97,6 +97,24 @@ if (user) {
   );
 }
 
+/* ---------------- recurringPayments ---------------- */
+
+let recurringPayments = [];
+if (user) {
+
+  const { data, error } = await supabase
+    .from("recurring_payments")
+    .select(`
+      *,
+      categories(name)
+    `)
+    .eq("user_id", user.id);
+
+  if (!error && data) {
+    recurringPayments = data;
+  }
+} 
+
 /* ---------------- FINAL STATE ---------------- */
 const state = {
   username,
@@ -106,13 +124,19 @@ const state = {
 
 
 const displayUsername = document.getElementById('display-username');
+
 const balanceValue = document.getElementById('balance-value');
 const incomeValue = document.getElementById('income-value');
 const expenseValue = document.getElementById('expense-value');
+
 const transactionForm = document.getElementById('transaction-form');
 const budgetForm = document.getElementById('budget-form');
+const recurringForm = document.getElementById("recurring-form");
+
 const transactionList = document.getElementById('transaction-list');
 const budgetList = document.getElementById('budget-list');
+const recurringList = document.getElementById("recurring-list");
+
 /* ---------------- CHARTS ---------------- */
 
 const expenseCategoryChartCanvas = document.getElementById(
@@ -267,6 +291,7 @@ function renderCharts() {
     }
   );
 
+
   /* =========================
      BAR CHART
      Expenses by Month
@@ -358,6 +383,43 @@ function renderCharts() {
       }
     }
   );
+}
+
+
+function renderRecurringPayments() {
+
+  recurringList.innerHTML = "";
+
+  if (recurringPayments.length === 0) {
+    recurringList.innerHTML =
+      '<p class="small-note">No recurring payments yet.</p>';
+    return;
+  }
+
+  recurringPayments.forEach(payment => {
+    const row =
+      document.createElement("article");
+
+    row.className = "list-row";
+
+    row.innerHTML = `
+      <div>
+        <h3>${payment.title}</h3>
+
+        <p>
+          ${payment.categories?.name || "Unknown"}
+          •
+          ${payment.frequency}
+        </p>
+      </div>
+
+      <strong class="expense">
+        ${currency(payment.amount)}
+      </strong>
+    `;
+
+    recurringList.appendChild(row);
+  });
 }
 
 transactionForm.addEventListener("submit", async (event) => {
@@ -578,6 +640,166 @@ state.budgets = state.budgets.filter(
 
 });
 
+recurringForm.addEventListener("submit",async (e) => {
+    e.preventDefault();
+
+    const title =
+      document
+        .getElementById("recurring-title")
+        .value
+        .trim();
+
+    const amount = Number(
+      document
+        .getElementById("recurring-amount")
+        .value
+    );
+
+    const categoryName =
+      document
+        .getElementById("recurring-category")
+        .value
+        .trim();
+
+    const frequency =
+      document
+        .getElementById("recurring-frequency")
+        .value;
+
+    if (!title || !amount || !categoryName)
+      return;
+
+    let categoryId;
+
+    /* FIND CATEGORY */
+
+    let { data: category } =
+      await supabase
+        .from("categories")
+        .select("id")
+        .eq("user_id", user.id)
+        .ilike("name", categoryName)
+        .maybeSingle();
+
+    /* CREATE CATEGORY */
+
+    if (!category) {
+
+      const {
+        data: newCategory
+      } = await supabase
+        .from("categories")
+        .insert([
+          {
+            user_id: user.id,
+            name: categoryName,
+            type: "expense"
+          }
+        ])
+        .select()
+        .single();
+
+      category = newCategory;
+    }
+
+    categoryId = category.id;
+
+    /* INSERT PAYMENT */
+
+    const today =
+      new Date()
+        .toISOString()
+        .split("T")[0];
+
+    const { data, error } =
+      await supabase
+        .from("recurring_payments")
+        .insert([
+          {
+            user_id: user.id,
+            category_id: categoryId,
+            title,
+            amount,
+            frequency,
+            next_due_date: today
+          }
+        ])
+        .select(`
+          *,
+          categories(name)
+        `)
+        .single();
+
+    if (error) {
+      console.log(error);
+      return;
+    }
+
+    recurringPayments.push(data);
+    renderRecurringPayments();
+    processRecurringPayments();
+    recurringForm.reset();
+  }
+);
+async function processRecurringPayments() {
+
+  const today =
+    new Date()
+      .toISOString()
+      .split("T")[0];
+
+  for (const payment of recurringPayments) {
+
+    if (
+      payment.active &&
+      payment.next_due_date <= today
+    ) {
+
+      /* CREATE TRANSACTION */
+
+      await supabase
+        .from("transactions")
+        .insert([
+          {
+            user_id: user.id,
+            name: payment.title,
+            amount: payment.amount,
+            type: "expense",
+            category_id:
+              payment.category_id
+          }
+        ]);
+
+      /* NEXT DATE */
+
+      const next =
+        new Date(payment.next_due_date);
+
+      if (payment.frequency === "monthly") {
+        next.setMonth(next.getMonth() + 1);
+      }
+
+      if (payment.frequency === "weekly") {
+        next.setDate(next.getDate() + 7);
+      }
+
+      if (payment.frequency === "yearly") {
+        next.setFullYear(next.getFullYear() + 1);
+      }
+
+      await supabase
+        .from("recurring_payments")
+        .update({
+          next_due_date:
+            next
+              .toISOString()
+              .split("T")[0]
+        })
+        .eq("id", payment.id);
+    }
+  }
+}
+
 
 
 displayUsername.textContent = state.username;
@@ -585,3 +807,5 @@ renderOverview();
 renderTransactions();
 renderBudgets();
 renderCharts();
+await processRecurringPayments();
+renderRecurringPayments();

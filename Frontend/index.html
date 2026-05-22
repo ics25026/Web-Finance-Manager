@@ -1,52 +1,614 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <link rel="stylesheet" href="styles.css">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Finance Manager</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FinTrack — Personal Finance Dashboard</title>
+  <meta name="description" content="Track your spending, set budgets, and stay in control of your finances with FinTrack.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Source+Sans+3:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ── Landing-page-specific overrides ── */
+    body { background: var(--clr-bg); }
+
+    /* Skip to content — keyboard nav */
+    .skip-link {
+      position: absolute;
+      top: -100%;
+      left: var(--sp-4);
+      padding: var(--sp-2) var(--sp-4);
+      background: var(--clr-navy);
+      color: #f5f0e8;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+      z-index: 999;
+      text-decoration: none;
+      transition: top 0.1s;
+    }
+    .skip-link:focus { top: 0; }
+
+    /* Hero */
+    .hero {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-10);
+      align-items: center;
+      background: var(--clr-surface-0);
+      border: 1px solid var(--clr-border);
+      border-top: 3px solid var(--clr-navy);
+      border-radius: var(--radius-md);
+      padding: var(--sp-10);
+      margin-bottom: 0;
+    }
+
+    .hero-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: var(--sp-3);
+      margin-bottom: var(--sp-4);
+    }
+
+    .hero-eyebrow hr {
+      flex: 1;
+      border: none;
+      border-top: 1px solid var(--clr-rule);
+      margin: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      margin-bottom: var(--sp-4);
+      line-height: 1.1;
+    }
+
+    .hero h1 em {
+      font-style: italic;
+      color: var(--clr-gold);
+    }
+
+    .hero > p,
+    .hero-copy > p {
+      font-size: 1rem;
+      max-width: 440px;
+      margin-bottom: var(--sp-6);
+      line-height: 1.7;
+    }
+
+    /* Hero visual — stat preview panel */
+    .hero-panel {
+      background: var(--clr-surface-1);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: var(--sp-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-4);
+    }
+
+    .hero-panel-title {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+      border-bottom: 1px solid var(--clr-rule);
+      padding-bottom: var(--sp-3);
+    }
+
+    .panel-metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-3);
+    }
+
+    .panel-metric {
+      background: var(--clr-surface-0);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      padding: var(--sp-3) var(--sp-4);
+    }
+
+    .panel-metric .lbl {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+      margin-bottom: var(--sp-1);
+    }
+
+    .panel-metric strong {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--clr-text-primary);
+      letter-spacing: -0.02em;
+      display: block;
+    }
+
+    .panel-metric .delta {
+      font-size: 0.72rem;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .panel-bar-section { display: flex; flex-direction: column; gap: var(--sp-2); }
+
+    .panel-bar-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.72rem;
+      color: var(--clr-text-secondary);
+    }
+
+    .panel-bar-label span:last-child { font-weight: 600; color: var(--clr-text-primary); }
+
+    .panel-track {
+      height: 5px;
+      background: var(--clr-surface-2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .panel-fill {
+      height: 100%;
+      border-radius: 2px;
+      background: var(--clr-navy);
+    }
+
+    .panel-fill.gold { background: var(--clr-gold); }
+
+    /* Section wrapper */
+    .landing-section {
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-6);
+    }
+
+    .section-header {
+      border-bottom: 1px solid var(--clr-rule);
+      padding-bottom: var(--sp-5);
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--sp-4);
+    }
+
+    .section-header h2 { margin-bottom: var(--sp-1); }
+    .section-header p  { font-size: 0.9375rem; max-width: 480px; }
+    .section-num {
+      font-family: var(--font-serif);
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--clr-surface-2);
+      letter-spacing: -0.03em;
+      flex-shrink: 0;
+    }
+
+    /* Feature cards */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-4);
+    }
+
+    .feature-card {
+      background: var(--clr-surface-0);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: var(--sp-6);
+      display: flex;
+      flex-direction: column;
+      gap: var(--sp-3);
+      transition: border-color 0.18s, box-shadow 0.18s;
+      position: relative;
+    }
+
+    .feature-card:hover {
+      border-color: var(--clr-border-strong);
+      box-shadow: 0 2px 14px rgba(15,31,61,0.07);
+    }
+
+    .feature-icon {
+      width: 36px;
+      height: 36px;
+      background: var(--clr-navy-dim);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--clr-navy);
+      flex-shrink: 0;
+    }
+
+    .feature-card h3 {
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--clr-text-primary);
+      margin: 0;
+    }
+
+    .feature-card p {
+      font-size: 0.875rem;
+      color: var(--clr-text-secondary);
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .feature-card .feature-tag {
+      margin-top: auto;
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--clr-text-muted);
+    }
+
+    /* Benefits / how it works */
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--sp-4);
+    }
+
+    .benefit-row {
+      display: flex;
+      gap: var(--sp-4);
+      align-items: flex-start;
+      background: var(--clr-surface-0);
+      border: 1px solid var(--clr-border);
+      border-radius: var(--radius-md);
+      padding: var(--sp-5);
+      transition: border-color 0.18s;
+    }
+
+    .benefit-row:hover { border-color: var(--clr-border-strong); }
+
+    .benefit-num {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--clr-surface-2);
+      line-height: 1;
+      flex-shrink: 0;
+      width: 32px;
+      text-align: right;
+    }
+
+    .benefit-text h3 {
+      font-family: var(--font-serif);
+      font-size: 0.95rem;
+      font-weight: 600;
+      margin-bottom: var(--sp-1);
+    }
+
+    .benefit-text p {
+      font-size: 0.84375rem;
+      color: var(--clr-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* Social proof strip */
+    .proof-strip {
+      background: var(--clr-navy);
+      border-radius: var(--radius-md);
+      padding: var(--sp-6) var(--sp-8);
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--sp-6);
+      text-align: center;
+    }
+
+    .proof-stat strong {
+      font-family: var(--font-serif);
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: #f5f0e8;
+      display: block;
+      letter-spacing: -0.02em;
+    }
+
+    .proof-stat span {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: rgba(245,240,232,0.5);
+    }
+
+    /* CTA section */
+    .cta-section {
+      background: var(--clr-surface-0);
+      border: 1px solid var(--clr-border);
+      border-top: 3px solid var(--clr-gold);
+      border-radius: var(--radius-md);
+      padding: var(--sp-10);
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--sp-4);
+    }
+
+    .cta-section h2 {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      max-width: 480px;
+    }
+
+    .cta-section p {
+      max-width: 400px;
+      font-size: 0.9375rem;
+    }
+
+    .cta-actions {
+      display: flex;
+      gap: var(--sp-3);
+      align-items: center;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-top: var(--sp-2);
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .hero            { grid-template-columns: 1fr; }
+      .feature-grid    { grid-template-columns: 1fr; }
+      .benefits-grid   { grid-template-columns: 1fr; }
+      .proof-strip     { grid-template-columns: 1fr; gap: var(--sp-4); }
+      .hero-panel      { display: none; }
+    }
+
+    @media (max-width: 640px) {
+      .hero            { padding: var(--sp-6); }
+      .cta-section     { padding: var(--sp-6); }
+    }
+  </style>
 </head>
 <body>
-    
-    <header class="site-header">
-        <nav class="navbar">
-            <a href="#" class="logo">FinTrack</a>
-            <ul class="nav-links">
-                <li><a href="#features">Features</a></li>
-                <li><a href="#benefits">Benefits</a></li>
-                <li><button type="button"><a href="signup.html">Get Started</a></button></li>
-                <li><a href="login.html">Login</a></li>
-            </ul>
-        </nav>
-    </header>
-    <main>
-        <section class="hero">
-            <div id ="hero-content">
-                <span class="badge">Personal finance</span>
-                <h1>FinTrack</h1>
-                <p>Track your spending, save smarter, and stay in control with a calm, playful dashboard.</p>
-                
-            </div>
-        </section>
-        <section class="feature-grid" id="features">
-            <article class="feature-card">
-                <h2>Smart budgets</h2>
-                <p>Create flexible plans, categorize expenses, and keep each week on track.</p>
-            </article>
-            <article class="feature-card">
-                <h2>Expense tracking</h2>
-                <p>Log payments quickly and see trends that help you save more.</p>
-            </article>
-            <article class="feature-card">
-                <h2>Goal progress</h2>
-                <p>Set savings targets, monitor progress, and celebrate every milestone.</p>
-            </article>
-        </section>
 
-        
-    </main>
-    <footer>
-        <p>Built for everyday budgeting with a bright, simple experience.</p>
-    </footer>
+  <a href="#main-content" class="skip-link">Skip to content</a>
+
+  <!-- ═══════════════ NAV ═══════════════ -->
+  <header class="site-header" role="banner">
+    <nav class="navbar" aria-label="Primary navigation">
+      <a href="#" class="logo" aria-label="FinTrack home">FinTrack</a>
+
+      <ul class="nav-links" role="list">
+        <li><a href="#features">Features</a></li>
+        <li><a href="#benefits">How it works</a></li>
+        <li><a href="login.html">Sign in</a></li>
+      </ul>
+
+      <a href="signup.html" class="header-cta">Get started</a>
+    </nav>
+  </header>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main id="main-content">
+
+    <!-- ── Hero ── -->
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-copy">
+        <div class="hero-eyebrow">
+          <span class="badge">Personal finance</span>
+          <hr aria-hidden="true">
+        </div>
+
+        <h1 id="hero-heading">
+          Your money,<br>
+          <em>finally clear.</em>
+        </h1>
+
+        <p>
+          Track spending, set budgets, and understand where every euro goes —
+          in a dashboard built for clarity, not complexity.
+        </p>
+
+        <div class="hero-actions">
+          <a href="signup.html" class="primary-button">Start for free</a>
+          <a href="#features" class="secondary-link">
+            See how it works
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Decorative stats panel -->
+      <div class="hero-panel" aria-hidden="true">
+        <p class="hero-panel-title">May 2026 — overview</p>
+
+        <div class="panel-metrics">
+          <div class="panel-metric">
+            <div class="lbl">Balance</div>
+            <strong>€84,320</strong>
+            <div class="delta delta-up">▲ 3.2%</div>
+          </div>
+          <div class="panel-metric">
+            <div class="lbl">Saved</div>
+            <strong>€2,640</strong>
+            <div class="delta delta-up">▲ this month</div>
+          </div>
+          <div class="panel-metric">
+            <div class="lbl">Income</div>
+            <strong>€6,450</strong>
+            <div class="delta">May total</div>
+          </div>
+          <div class="panel-metric">
+            <div class="lbl">Expenses</div>
+            <strong>€3,810</strong>
+            <div class="delta delta-down">▼ vs last month</div>
+          </div>
+        </div>
+
+        <div class="panel-bar-section">
+          <div>
+            <div class="panel-bar-label"><span>Housing</span><span>€650</span></div>
+            <div class="panel-track"><div class="panel-fill" style="width:72%"></div></div>
+          </div>
+          <div>
+            <div class="panel-bar-label"><span>Food</span><span>€420</span></div>
+            <div class="panel-track"><div class="panel-fill" style="width:47%"></div></div>
+          </div>
+          <div>
+            <div class="panel-bar-label"><span>Transport</span><span>€210</span></div>
+            <div class="panel-track"><div class="panel-fill gold" style="width:23%"></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Social proof ── -->
+    <div class="proof-strip" aria-label="Key statistics" role="region">
+      <div class="proof-stat">
+        <strong>12,000+</strong>
+        <span>Active users</span>
+      </div>
+      <div class="proof-stat">
+        <strong>€2.4M</strong>
+        <span>Tracked monthly</span>
+      </div>
+      <div class="proof-stat">
+        <strong>4.9 ★</strong>
+        <span>Average rating</span>
+      </div>
+    </div>
+
+    <!-- ── Features ── -->
+    <section class="landing-section" id="features" aria-labelledby="features-heading">
+      <div class="section-header">
+        <div>
+          <h4>Features</h4>
+          <h2 id="features-heading">Everything you need, nothing you don't</h2>
+          <p>A focused set of tools that cover the full picture of your personal finances.</p>
+        </div>
+        <span class="section-num" aria-hidden="true">01</span>
+      </div>
+
+      <div class="feature-grid">
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+          </div>
+          <h3>Smart budgets</h3>
+          <p>Create flexible plans per category, set monthly limits, and get alerted before you overspend.</p>
+          <span class="feature-tag">Budgeting</span>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16V4m0 0L3 8m4-4 4 4"/><path d="M17 8v12m0 0 4-4m-4 4-4-4"/></svg>
+          </div>
+          <h3>Expense tracking</h3>
+          <p>Log every payment in seconds. See weekly trends and understand exactly where your money goes.</p>
+          <span class="feature-tag">Transactions</span>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          </div>
+          <h3>Balance over time</h3>
+          <p>Visualise your net worth trajectory month by month and track whether you're moving forward.</p>
+          <span class="feature-tag">Analytics</span>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+          </div>
+          <h3>Recurring payments</h3>
+          <p>Track subscriptions and fixed costs in one place. Never be surprised by a charge again.</p>
+          <span class="feature-tag">Automation</span>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </div>
+          <h3>Goal progress</h3>
+          <p>Set savings targets, monitor your pace, and celebrate every milestone on the way there.</p>
+          <span class="feature-tag">Planning</span>
+        </article>
+
+        <article class="feature-card">
+          <div class="feature-icon" aria-hidden="true">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 1 0 0 7h5a3.5 3.5 0 1 0 0 7H6"/></svg>
+          </div>
+          <h3>Cash flow reports</h3>
+          <p>Export monthly summaries. Share with an accountant or just keep for your own records.</p>
+          <span class="feature-tag">Reporting</span>
+        </article>
+      </div>
+    </section>
+
+    <!-- ── How it works ── -->
+    <section class="landing-section" id="benefits" aria-labelledby="benefits-heading">
+      <div class="section-header">
+        <div>
+          <h4>How it works</h4>
+          <h2 id="benefits-heading">Up and running in minutes</h2>
+          <p>No bank connections required. Just log, categorise, and understand.</p>
+        </div>
+        <span class="section-num" aria-hidden="true">02</span>
+      </div>
+
+      <div class="benefits-grid">
+        <div class="benefit-row">
+          <span class="benefit-num" aria-hidden="true">1</span>
+          <div class="benefit-text">
+            <h3>Create your account</h3>
+            <p>Sign up in under 30 seconds. No credit card, no bank login, no unnecessary permissions.</p>
+          </div>
+        </div>
+
+        <div class="benefit-row">
+          <span class="benefit-num" aria-hidden="true">2</span>
+          <div class="benefit-text">
+            <h3>Log your transactions</h3>
+            <p>Add income and expenses manually. Categorise as you go — the dashboard updates instantly.</p>
+          </div>
+        </div>
+
+        <div class="benefit-row">
+          <span class="benefit-num" aria-hidden="true">3</span>
+          <div class="benefit-text">
+            <h3>Set your budgets</h3>
+            <p>Define monthly limits per category. FinTrack shows you how much headroom you have left.</p>
+          </div>
+        </div>
+
+        <div class="benefit-row">
+          <span class="benefit-num" aria-hidden="true">4</span>
+          <div class="benefit-text">
+            <h3>Read your dashboard</h3>
+            <p>Charts and summaries give you a clear picture at a glance — no spreadsheets, no confusion.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA ── -->
+    <section class="cta-section" aria-labelledby="cta-heading">
+      <span class="badge badge-gold">Free to use</span>
+      <h2 id="cta-heading">Take control of your finances today</h2>
+      <p>Join thousands of people who track their money clearly and save more every month.</p>
+      <div class="cta-actions">
+        <a href="signup.html" class="primary-button">Create free account</a>
+        <a href="login.html" class="secondary-link">Already have an account? Sign in →</a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer role="contentinfo">
+    <p>FinTrack &mdash; personal finance, made simple.</p>
+  </footer>
+
 </body>
 </html>
