@@ -262,7 +262,6 @@ main:not(:has(.sidebar)) {
     gap: var(--sp-10);
     display: flex;
     flex-direction: column;
-    max-width: 1080px;
 }
 
 /* ============================================================
